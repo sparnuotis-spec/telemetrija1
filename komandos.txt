@@ -1,0 +1,304 @@
+FPV FLIGHT DESK — ESSENTIAL COMMANDS
+====================================
+Repository: https://github.com/sparnuotis-spec/telemetrija1
+Platform: Windows 10
+
+Replace paths and IP addresses with the values used on your computers.
+
+
+1. CHECK PYTHON
+---------------
+python --version
+py --version
+
+If Python is not found, install Python from:
+https://www.python.org/downloads/windows/
+
+During installation, enable:
+Add Python to PATH
+
+
+2. OPEN THE PROJECT FOLDER
+--------------------------
+cd C:\FPV\fpv_ops
+
+If the folder is somewhere else, replace the path above.
+
+
+3. CREATE THE PYTHON ENVIRONMENT
+--------------------------------
+python -m venv .venv
+
+If python does not work:
+py -m venv .venv
+
+Activate it:
+.venv\Scripts\activate
+
+The command prompt should begin with:
+(.venv)
+
+Deactivate it when finished:
+deactivate
+
+
+4. INSTALL OR UPDATE DEPENDENCIES
+---------------------------------
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+
+5. START THE ADMIN APPLICATION
+------------------------------
+cd C:\FPV\fpv_ops
+.venv\Scripts\activate
+set FPV_DATA_DIR=D:\FPV_SESSION_DATA
+set FPV_HOST=0.0.0.0
+set FPV_PORT=5050
+python app.py
+
+Keep this Command Prompt window open during the session.
+
+Open the Admin interface on the same laptop:
+http://127.0.0.1:5050/admin
+
+Stop the application with:
+Ctrl+C
+
+
+6. START WITHOUT A SEPARATE DATA DRIVE
+---------------------------------------
+cd C:\FPV\fpv_ops
+.venv\Scripts\activate
+python app.py
+
+The application will create its data folder here:
+C:\FPV\fpv_ops\data
+
+For real sessions, use a separate drive if possible:
+set FPV_DATA_DIR=D:\FPV_SESSION_DATA
+
+
+7. CREATE THE DATA FOLDER
+-------------------------
+mkdir D:\FPV_SESSION_DATA
+mkdir D:\FPV_LAPTOP_2_DATA
+
+The application creates these folders automatically if they do not exist:
+blackbox
+video
+.partial
+
+
+8. FIND THE ADMIN LAPTOP HOTSPOT IP
+------------------------------------
+ipconfig
+
+Look for the IPv4 Address of the adapter connected to the hotspot.
+Example:
+192.168.137.1
+
+Short version:
+ipconfig | findstr /i "IPv4"
+
+
+9. ALLOW PORT 5050 THROUGH WINDOWS FIREWALL
+-------------------------------------------
+Run Command Prompt as Administrator, then execute:
+
+netsh advfirewall firewall add rule name="FPV Flight Desk 5050" dir=in action=allow protocol=TCP localport=5050 profile=private
+
+Remove the rule later if needed:
+
+netsh advfirewall firewall delete rule name="FPV Flight Desk 5050"
+
+
+10. OPEN THE OFFICER INTERFACE
+------------------------------
+On a phone or laptop connected to the same hotspot, open:
+
+http://ADMIN_HOTSPOT_IP:5050/officer
+
+Example:
+http://192.168.137.1:5050/officer
+
+Admin interface from another device:
+http://ADMIN_HOTSPOT_IP:5050/admin
+
+
+11. TEST HOTSPOT CONNECTIVITY
+-----------------------------
+From the second laptop:
+
+ping 192.168.137.1
+
+Then test the application:
+
+curl http://192.168.137.1:5050/api/state
+
+If curl is unavailable, open this URL in a browser:
+
+http://192.168.137.1:5050/api/state
+
+
+12. RUN THE SECOND TELEMETRY LAPTOP
+-----------------------------------
+On the second laptop:
+
+cd C:\FPV\fpv_ops
+.venv\Scripts\activate
+set FPV_DATA_DIR=D:\FPV_LAPTOP_2_DATA
+set FPV_HOST=0.0.0.0
+set FPV_PORT=5050
+python app.py
+
+Open its local Admin page:
+http://127.0.0.1:5050/admin
+
+The second laptop stores its files in:
+D:\FPV_LAPTOP_2_DATA\blackbox
+D:\FPV_LAPTOP_2_DATA\video
+
+
+13. SYNCHRONIZE TWO LAPTOPS
+---------------------------
+Run this on the second laptop after replacing the IP address:
+
+cd C:\FPV\fpv_ops
+.venv\Scripts\activate
+set FPV_PEER_URL=http://192.168.137.1:5050
+set FPV_LOCAL_URL=http://127.0.0.1:5050
+python sync_peer.py
+
+Run the reverse direction on the admin laptop if required:
+
+set FPV_PEER_URL=http://SECOND_LAPTOP_IP:5050
+set FPV_LOCAL_URL=http://127.0.0.1:5050
+python sync_peer.py
+
+Synchronization exchanges flight metadata, statuses, and pilot tags.
+It does not copy large video or blackbox files.
+
+
+14. CHECK THE API STATUS
+------------------------
+Browser URLs:
+
+http://127.0.0.1:5050/api/state
+http://127.0.0.1:5050/api/flights
+http://127.0.0.1:5050/api/flights?pilot_id=PILOT-001
+http://127.0.0.1:5050/api/flights?status=FLYING
+http://127.0.0.1:5050/api/flights?status=TRANSFERRING
+http://127.0.0.1:5050/api/sync/events?after=0
+
+
+15. EXPORT THE FLIGHT LEDGER
+----------------------------
+Open this URL in a browser:
+
+http://127.0.0.1:5050/export/flights.csv
+
+The downloaded file can be imported into the Google Sheet after the session.
+
+
+16. BACK UP SESSION DATA
+------------------------
+Stop the app first with Ctrl+C.
+
+Copy the whole data folder to a backup drive:
+
+robocopy D:\FPV_SESSION_DATA E:\FPV_BACKUPS\SESSION_01 /E /COPY:DAT /R:2 /W:2
+
+For the second laptop:
+
+robocopy D:\FPV_LAPTOP_2_DATA E:\FPV_BACKUPS\LAPTOP_2_SESSION_01 /E /COPY:DAT /R:2 /W:2
+
+Do not delete ops.sqlite3, blackbox, video, or .partial before making a backup.
+
+
+17. LIST STORED FILES
+---------------------
+dir D:\FPV_SESSION_DATA\blackbox
+dir D:\FPV_SESSION_DATA\video
+dir D:\FPV_SESSION_DATA\.partial
+
+
+18. GIT — DOWNLOAD THE LATEST VERSION
+--------------------------------------
+git clone https://github.com/sparnuotis-spec/telemetrija1.git C:\FPV\fpv_ops
+
+For an existing checkout:
+
+cd C:\FPV\fpv_ops
+git pull origin main
+
+
+19. GIT — CHECK LOCAL CHANGES
+-----------------------------
+git status
+git diff
+
+
+20. GIT — SAVE AND PUSH CHANGES
+-------------------------------
+git add .
+git commit -m "Describe the change"
+git push origin main
+
+
+21. GIT — SHOW THE CURRENT VERSION
+----------------------------------
+git log --oneline -5
+git branch --show-current
+git remote -v
+
+
+22. COMMON TROUBLESHOOTING
+--------------------------
+If port 5050 is already in use:
+
+netstat -ano | findstr :5050
+
+Then identify the process:
+
+tasklist /FI "PID eq PROCESS_ID"
+
+Stop it only if it is the old FPV application process:
+
+taskkill /PID PROCESS_ID /F
+
+Start on another port if necessary:
+
+set FPV_PORT=5051
+python app.py
+
+Then open:
+http://127.0.0.1:5051/admin
+
+If devices cannot connect:
+1. Confirm both devices use the same hotspot.
+2. Run ipconfig again.
+3. Confirm Python is still running.
+4. Confirm the Windows Firewall rule exists.
+5. Confirm the URL uses the admin laptop IP, not 127.0.0.1.
+
+If the browser shows an old page, press:
+Ctrl+F5
+
+
+23. IMPORTANT SAFETY RULES
+--------------------------
+Do not publish these files to GitHub:
+- data\
+- *.mp4
+- *.bbl
+- *.sqlite3
+- *.xlsx
+- .env
+- .venv\
+
+The repository .gitignore already excludes them.
+
+Do not delete .partial files while a transfer is active.
+Do not move or rename media files until the app reports the transfer is complete.
+Keep a backup of the full data folder after every session.
