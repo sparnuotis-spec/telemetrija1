@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+data/
+*.sqlite3
+*.bbl
+*.mp4
+*.part
+.env
+*.xlsx
+.DS_Store
