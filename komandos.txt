@@ -371,3 +371,34 @@ For SD-card pilots, do not use the onboard-flash button.
 6. Assign the video separately when it arrives.
 
 The app does not erase SD cards and does not attempt to read SD-card files through MSP.
+
+
+27. NEW SESSION WORKFLOW
+------------------------
+Open the Admin page and use the tabs in this order:
+
+SETUP:
+1. Tick only pilots who actually arrived.
+2. Type each selected pilot's name once.
+3. Select the scenarios planned for this session.
+4. Select the session ID.
+5. Click Save setup and generate flights.
+
+WORKFLOW:
+Review the generated flight list. Each flight receives its flight number automatically. CALM/DYN, W1/W2, and REP-01 through REP-04 are assigned automatically. Use the assignment row to manually set the pilot, battery, and scenario. The next recommended scenario is shown beside each row.
+
+REALTIME:
+Use the pilot status board. Status meanings:
+NaN = pilot has not told the admin he is ready
+Waiting = pilot is ready and waiting
+Flying = currently flying
+Need transfer = flight landed and data/video transfer is needed
+Transferring = transfer is in progress
+Done = flight is complete and all required data is present
+False = flight has a problem or missing data; set manually
+
+HISTORY:
+Review flights marked Done or False.
+
+OFFICER:
+Open /officer. The Officer sees flight number, scenario, battery, weather, repetition, date, and pilot statuses. The Officer has no SD-card tag control and cannot edit setup.

@@ -83,3 +83,10 @@ The application now supports two separate Blackbox workflows. For **onboard flas
 For **onboard SD-card** logs, use the existing SD-card/file intake controls: remove the card safely after disarming, insert it into a card reader, and drag the matching Blackbox log file into the selected flight's RAW file control. SD-card logs are not read directly through the Betaflight MSP path.
 
 The direct USB path requires `pyserial` and Windows flight-controller USB drivers. The connected craft must be unarmed and must not be disconnected during transfer. Test one non-critical flight first on every FC family before operational use.
+
+
+## Configurable session workflow
+
+Before each session, the Admin uses **Setup** to activate only pilots who arrived, enter their names, choose the scenarios for that session, and select the workbook session ID. Saving Setup regenerates the session flight ledger. Flight numbers are automatic; mode, weather, and repetition are generated automatically. The Admin can then manually assign the pilot, battery, and scenario for each flight, with the next scenario recommendation shown alongside the row.
+
+The **Realtime** tab displays the requested pilot/flight states: `NaN`, `Waiting`, `Flying`, `Need transfer`, `Transferring`, `Done`, and `False`. Admin buttons manually move a current flight between these states. The **History** tab shows Done and False flights. The Officer page is read-only and shows the flight number, scenario, battery, weather, repetition, date, and pilot statuses; it does not show the SD-card tag control.
