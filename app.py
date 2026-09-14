@@ -62,7 +62,7 @@ def state():
 @app.get('/')
 def home(): return render_template('index.html')
 @app.get('/<role>')
-def role(role): return render_template('index.html',role=role if role in ('admin','officer') else 'admin')
+def role(role): return render_template('index.html',role=role if role in ('admin','officer','collector') else 'admin')
 @app.get('/api/state')
 def api_state(): return jsonify(state())
 @app.get('/api/flights')

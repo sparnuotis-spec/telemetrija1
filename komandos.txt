@@ -302,3 +302,31 @@ The repository .gitignore already excludes them.
 Do not delete .partial files while a transfer is active.
 Do not move or rename media files until the app reports the transfer is complete.
 Keep a backup of the full data folder after every session.
+
+
+24. TWO-LAPTOP OPERATING MODE
+-----------------------------
+Admin laptop controls flight order:
+
+http://127.0.0.1:5050/admin
+
+Second laptop gathers data for two pilots in parallel:
+
+http://ADMIN_HOTSPOT_IP:5050/collector
+
+The Collector page has two blackbox bays. Use one bay for each of the two pilots being collected. Select the exact flight from the dropdown before assigning RAW or video.
+
+The Collector page does not have Claim, Fly, or Land controls. The admin laptop remains responsible for deciding which pilots fly next.
+
+Recommended startup:
+
+Admin laptop:
+set FPV_HOST=0.0.0.0
+set FPV_PORT=5050
+set FPV_DATA_DIR=D:\FPV_SESSION_DATA
+python app.py
+
+Second laptop browser:
+http://ADMIN_HOTSPOT_IP:5050/collector
+
+In this shared-server mode, do not run app.py or sync_peer.py on the second laptop. Both laptops use the admin laptop's single live database, while the collector laptop uploads files through the browser to the admin laptop.

@@ -6,13 +6,15 @@ This is a local-first operations app for the attached `Viskas.xlsx` workflow. It
 
 The workbook contains the `SKRYDzIAI` ledger with 1,920 flight rows (`FL-000001` through `FL-001920`), a `Sesija` column, and 20 session slots shown in `Valandos` as `Sesija 1` through `Sesija 20`. The ledger currently contains placeholder values such as `PILOT-0`, `SC-`, and `REP-0` in much of the template, so the app does **not** silently trust those broken placeholders. It generates the intended 20 pilots × 6 scenarios × 2 modes × 2 weather conditions × 4 repetitions matrix and exposes the session ID explicitly for every flight.
 
-## Two interfaces
+## Three interfaces
 
 Open `/admin` on the admin laptop. This is the control console with the large pilot queue, previous/current/future flight views, session selector, pilot tags, two blackbox bays, exact telemetry assignment dropdowns, and the video queue.
 
 Open `/officer` on the officer device. This is the operational board with previous/current/future flights, flight queue, video queue, pilot statuses, and the same session context. The telemetry assignment controls are hidden so the officer cannot accidentally reassign files.
 
 The interface is responsive for phones and laptops.
+
+Open `/collector` on the second laptop. This is the two-bay collection station: it can select exact flights and assign RAW/video files, but it has no Claim, Fly, or Land controls. The admin laptop remains the only device that controls who flies next. Use Blackbox bay 1 for collector pilot A and Blackbox bay 2 for collector pilot B; select the exact flight in each bay before assigning a file.
 
 ## Run
 
