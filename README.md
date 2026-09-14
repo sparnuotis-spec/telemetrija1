@@ -74,3 +74,12 @@ FPV_PEER_URL=http://192.168.43.1:5050 FPV_LOCAL_URL=http://127.0.0.1:5050 python
 Run the same command from the other laptop with the URLs reversed. This exchanges flight statuses, pilot tags, sessions, and file metadata. It deliberately does **not** copy video or blackbox media during the session. You can move `data/blackbox` and `data/video` manually after the session as requested.
 
 The video queue is generated after every fourth landed flight per pilot, based on the pilot's actual landed/transfer/complete count rather than the repetition label. This supports fast SD-card pilots that fly continuously.
+
+
+## Blackbox transfer modes
+
+The application now supports two separate Blackbox workflows. For **onboard flash/dataflash**, connect an unarmed flight controller by USB, open the Admin or Collector page, select the detected serial port, identify the board, select the exact flight, and choose **Download onboard flash**. The app uses Betaflight MSP dataflash commands, writes to a temporary file, verifies that bytes were received, and then saves the canonical `.bbl` file. It never erases the dataflash automatically.
+
+For **onboard SD-card** logs, use the existing SD-card/file intake controls: remove the card safely after disarming, insert it into a card reader, and drag the matching Blackbox log file into the selected flight's RAW file control. SD-card logs are not read directly through the Betaflight MSP path.
+
+The direct USB path requires `pyserial` and Windows flight-controller USB drivers. The connected craft must be unarmed and must not be disconnected during transfer. Test one non-critical flight first on every FC family before operational use.

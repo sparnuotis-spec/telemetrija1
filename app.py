@@ -3,6 +3,7 @@ import csv, io, json, os, shutil, sqlite3, threading, uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from flask import Flask, jsonify, render_template, request, send_from_directory
+from betaflight_msp import ports as bf_ports, identify as bf_identify, download as bf_download
 
 BASE=Path(__file__).resolve().parent
 DATA=Path(os.getenv('FPV_DATA_DIR', BASE/'data')); RAW=DATA/'blackbox'; VIDEO=DATA/'video'; PART=DATA/'.partial'
@@ -102,6 +103,32 @@ def api_intake(fid):
 @app.post('/api/telemetry/assign')
 def assign():
  p=request.form; fid=int(p['flight_id']); return api_intake(fid)
+@app.get('/api/betaflight/ports')
+def betaflight_ports(): return jsonify(ports=bf_ports())
+@app.post('/api/betaflight/identify')
+def betaflight_identify():
+ device=(request.get_json() or {}).get('device','')
+ if not device:return jsonify(error='Select a Betaflight USB port'),400
+ try:return jsonify(ok=True,device=bf_identify(device))
+ except Exception as exc:return jsonify(error=str(exc)),400
+@app.post('/api/betaflight/download/<int:fid>')
+def betaflight_download(fid):
+ f=one('SELECT * FROM flights WHERE id=?',(fid,)); device=(request.get_json() or {}).get('device','')
+ if not f:return jsonify(error='flight not found'),404
+ if not device:return jsonify(error='Select a Betaflight USB port'),400
+ tmp=PART/(uuid.uuid4().hex+'.bbl.part'); final=RAW/safe(f"{f['flight_code']}_{f['pilot_id']}_{f['scenario']}_{f['mode']}_{f['weather']}_{f['repetition']}.bbl")
+ update(fid,{'status':'TRANSFERRING','source_device':device})
+ try:
+  result=bf_download(device,tmp)
+  if result.get('bytes_written',0)<=0:raise RuntimeError('No Blackbox bytes were downloaded')
+  shutil.move(tmp,final)
+  update(fid,{'raw_path':str(final.relative_to(DATA)),'raw_ok':'TAIP','source_device':device,'status':'COMPLETE' if f['video_ok']=='TAIP' else 'TRANSFERRING'})
+  return jsonify(ok=True,flight=one('SELECT * FROM flights WHERE id=?',(fid,)),download=result)
+ except Exception as exc:
+  try:tmp.unlink(missing_ok=True)
+  except Exception:pass
+  update(fid,{'status':'LANDED'})
+  return jsonify(error=str(exc)),400
 @app.post('/api/claim')
 def claim():
  p=request.get_json() or {}; pid=p.get('pilot_id');

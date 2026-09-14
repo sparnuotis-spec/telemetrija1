@@ -330,3 +330,44 @@ Second laptop browser:
 http://ADMIN_HOTSPOT_IP:5050/collector
 
 In this shared-server mode, do not run app.py or sync_peer.py on the second laptop. Both laptops use the admin laptop's single live database, while the collector laptop uploads files through the browser to the admin laptop.
+
+
+25. DIRECT BETАFLIGHT ONBOARD-FLASH DOWNLOAD
+--------------------------------------------
+Install the added USB serial dependency:
+
+python -m pip install -r requirements.txt
+
+Connect one flight controller by USB. Keep the craft unarmed. Start the app normally, then open:
+
+http://127.0.0.1:5050/admin
+
+or on the second laptop:
+
+http://127.0.0.1:5050/collector
+
+In the Onboard flash section:
+
+1. Click Refresh.
+2. Select the Betaflight COM port.
+3. Click Identify and verify the FC response.
+4. Select the exact flight.
+5. Click Download onboard flash.
+6. Keep USB connected until the status says the download completed.
+
+The app uses MSP_DATAFLASH_SUMMARY and MSP_DATAFLASH_READ. It saves the result using the exact flight filename and does not erase the dataflash automatically.
+
+If no COM port appears, install the FC USB driver, replace the USB cable, close Betaflight Configurator, and click Refresh again.
+
+26. SD-CARD BLACKBOX DRAG-AND-DROP
+----------------------------------
+For SD-card pilots, do not use the onboard-flash button.
+
+1. Disarm and wait for the FC to finish writing.
+2. Remove the SD card and insert it into a card reader.
+3. Open the Admin or Collector page.
+4. Select the exact flight.
+5. Drag the matching Blackbox log from the SD card into the RAW file control.
+6. Assign the video separately when it arrives.
+
+The app does not erase SD cards and does not attempt to read SD-card files through MSP.
